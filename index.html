@@ -1,1 +1,89 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TERRA-CORP OS</title>
+  <link href="https://googleapis.com" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="monitor-frame">
+    <!-- 상단: 사원 정보 & 예산 바 -->
+    <header id="top-bar">
+      <div class="info-group">
+        <span id="rank-badge">인턴</span>
+        <span id="planet-name">P-01 프로토스</span>
+        <span id="day-counter">DAY 1 / 30</span>
+      </div>
+      <div class="budget-group">
+        <span>예산: <strong id="budget-val">500</strong> Cr</span>
+        <span class="sub-text">(일일 <span id="net-income">+50</span>)</span>
+      </div>
+    </header>
+
+    <!-- 중단: 행성 뷰포트 + 지구 유사율 -->
+    <main id="viewport-section">
+      <div id="esi-overlay">
+        지구 유사율 <span id="esi-val">12.0</span>%
+      </div>
+      <canvas id="planet-canvas" width="160" height="160"></canvas>
+      <button id="complete-btn" class="hidden" onclick="completeProject()">[프로젝트 완료 보고]</button>
+    </main>
+
+    <!-- 데이터 패널: 5대 핵심 지표 & 레이더 차트 -->
+    <section id="data-panel">
+      <div id="radar-box">
+        <canvas id="radar-canvas" width="110" height="110"></canvas>
+      </div>
+      <div id="params-list">
+        <div class="param-row">
+          <span>온도</span>
+          <div class="bar-bg"><div id="bar-temp" class="bar-fill"></div></div>
+          <span id="val-temp">-40°C</span>
+        </div>
+        <div class="param-row">
+          <span>기압</span>
+          <div class="bar-bg"><div id="bar-press" class="bar-fill"></div></div>
+          <span id="val-press">10kPa</span>
+        </div>
+        <div class="param-row">
+          <span>수위</span>
+          <div class="bar-bg"><div id="bar-water" class="bar-fill"></div></div>
+          <span id="val-water">5%</span>
+        </div>
+        <div class="param-row">
+          <span>산소</span>
+          <div class="bar-bg"><div id="bar-o2" class="bar-fill"></div></div>
+          <span id="val-o2">1%</span>
+        </div>
+        <div class="param-row">
+          <span>생태</span>
+          <div class="bar-bg"><div id="bar-bio" class="bar-fill"></div></div>
+          <span id="val-bio">0%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 사내 메신저 / 이벤트 로그 창 -->
+    <section id="log-panel">
+      <div id="mail-header">[사내 메신저] 본사 관제팀</div>
+      <div id="log-message">입사를 축하합니다. 지구 유사율 97% 이상을 달성하십시오.</div>
+    </section>
+
+    <!-- 하단: 설비 컨트롤 바 & 다음 날 버튼 -->
+    <footer id="control-panel">
+      <div id="facility-list">
+        <!-- JS에서 설비 카드 자동 생성 -->
+      </div>
+      <button id="next-day-btn" onclick="nextDay()">[퇴근 및 일일 정산 ▶]</button>
+    </footer>
+  </div>
+
+  <script src="sound.js"></script>
+  <script src="data.js"></script>
+  <script src="render.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
