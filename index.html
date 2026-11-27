@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TERRA-CORP OS</title>
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
   <div id="monitor-frame">
@@ -23,20 +23,20 @@
       </div>
     </header>
 
-    <!-- 중단: 행성 뷰포트 + 지구 유사율 -->
+    <!-- 중단: 확대된 행성 뷰포트 + 지구 유사율 -->
     <main id="viewport-section">
       <div id="esi-overlay">
-        지구 유사율 <span id="esi-val">12.0</span>%
+        지구 유사율 <span id="esi-val">12.0</span>% <span class="sub-text">(목표 95%)</span>
         <div id="shield-status" class="sub-text">재해 방어율: 0%</div>
       </div>
-      <canvas id="planet-canvas" width="160" height="160"></canvas>
+      <canvas id="planet-canvas" width="220" height="220"></canvas>
       <button id="complete-btn" class="hidden" onclick="completeProject()">[프로젝트 완료 보고]</button>
     </main>
 
-    <!-- 데이터 패널: 5대 핵심 지표 & 레이더 차트 -->
+    <!-- 데이터 패널: 5대 핵심 지표 & 라벨 포함 레이더 차트 -->
     <section id="data-panel">
       <div id="radar-box">
-        <canvas id="radar-canvas" width="110" height="110"></canvas>
+        <canvas id="radar-canvas" width="136" height="136"></canvas>
       </div>
       <div id="params-list">
         <div class="param-row">
@@ -90,9 +90,9 @@
     </div>
   </div>
 
-  <script src="sound.js?v=10"></script>
-  <script src="data.js?v=10"></script>
-  <script src="render.js?v=10"></script>
-  <script src="game.js?v=10"></script>
+  <script src="sound.js?v=12"></script>
+  <script src="data.js?v=12"></script>
+  <script src="render.js?v=12"></script>
+  <script src="game.js?v=12"></script>
 </body>
 </html>
