@@ -1,4 +1,4 @@
-const SAVE_KEY = "terra_corp_save_v2";
+const SAVE_KEY = "terra_corp_save_v3";
 
 let state = {
   rankIdx: 0,
@@ -209,13 +209,14 @@ function claimQuest(qId) {
 function nextDay() {
   const p = PLANETS[state.planetIdx % PLANETS.length];
   let dailyUpkeep = 0;
+  let activeCount = 0;
 
-  // 어제 수치 기록 (변화량 계산용)
   const prev = Object.assign({}, state.stats);
 
   FACILITIES.forEach(function(f) {
     const item = state.owned[f.id];
     if (item && item.count > 0 && item.active) {
+      activeCount += item.count;
       dailyUpkeep += f.upkeep * item.count;
       state.stats.temp += (f.effect.temp || 0) * item.count;
       state.stats.press += (f.effect.press || 0) * item.count;
@@ -235,10 +236,11 @@ function nextDay() {
 
   const net = p.dailyGrant - dailyUpkeep;
   state.budget += net;
+  const finishedDay = state.day;
   state.day += 1;
   if (typeof SFX !== "undefined") SFX.nextDay();
 
-  // 행성 변화량 문자열 생성
+  // 1. 행성 환경 변화 요약
   let changes = [];
   const dTemp = state.stats.temp - prev.temp;
   const dPress = state.stats.press - prev.press;
@@ -246,23 +248,23 @@ function nextDay() {
   const dO2 = state.stats.o2 - prev.o2;
   const dBio = state.stats.bio - prev.bio;
 
-  if (dTemp !== 0) changes.push("온도" + (dTemp > 0 ? "+" : "") + dTemp + "°C");
-  if (dPress !== 0) changes.push("기압" + (dPress > 0 ? "+" : "") + dPress);
-  if (dWater !== 0) changes.push("수위" + (dWater > 0 ? "+" : "") + dWater + "%");
-  if (dO2 !== 0) changes.push("산소" + (dO2 > 0 ? "+" : "") + dO2 + "%");
-  if (dBio !== 0) changes.push("생태" + (dBio > 0 ? "+" : "") + dBio + "%");
+  if (dTemp !== 0) changes.push("온도 " + (dTemp > 0 ? "+" : "") + dTemp + "°C");
+  if (dPress !== 0) changes.push("기압 " + (dPress > 0 ? "+" : "") + dPress + "kPa");
+  if (dWater !== 0) changes.push("수위 " + (dWater > 0 ? "+" : "") + dWater + "%");
+  if (dO2 !== 0) changes.push("산소 " + (dO2 > 0 ? "+" : "") + dO2 + "%");
+  if (dBio !== 0) changes.push("생태 " + (dBio > 0 ? "+" : "") + dBio + "%");
 
-  const changeReport = changes.length > 0 ? "[" + changes.join(", ") + "]" : "[변화 없음]";
-  const randomBoss = (typeof BOSS_MESSAGES !== "undefined")
-    ? BOSS_MESSAGES[Math.floor(Math.random() * BOSS_MESSAGES.length)]
-    : "";
+  const changeHtml = changes.length > 0 ? changes.join(" / ") : "변화 없음 (가동 설비 없음)";
 
-  let statusMsg = state.day + "일차 정산 " + changeReport + " | " + randomBoss;
+  // 2. 상사 메시지 또는 돌발 이벤트 판정
+  let eventHtml = (typeof BOSS_MESSAGES !== "undefined")
+    ? "💬 " + BOSS_MESSAGES[Math.floor(Math.random() * BOSS_MESSAGES.length)]
+    : "💬 오늘도 수고하셨습니다.";
 
   const hasClaimable = QUESTS.some(function(q) { return !state.completedQuests.includes(q.id) && q.check(state.stats); });
   if (hasClaimable) {
     state.unreadMail = true;
-    statusMsg = "[메일 수신] 단기 퀘스트 목표 달성! 우측 상단 ✉메일함을 확인하세요.";
+    eventHtml = "✉ <b>[사내 메일 도착]</b> 단기 퀘스트 목표를 달성했습니다! 우측 상단 메일함에서 성과금을 수령하세요.";
   }
 
   if (Math.random() < 0.25) {
@@ -270,22 +272,21 @@ function nextDay() {
     if (ev.effect && (ev.effect.temp > 0 || ev.effect.bio < 0)) {
       const def = getDefenseRate();
       if (Math.random() * 100 < def) {
-        statusMsg = "[방어 성공] 대기 및 자기장 방패(" + def + "%)가 우주 재해를 막아냈습니다!";
+        eventHtml = "🛡️ <b>[재해 방어 성공]</b> 대기 및 자기장 방패(방어율 " + def + "%)가 우주 재해를 막아냈습니다!";
       } else {
-        statusMsg = ev.msg;
+        eventHtml = "⚠️ <b>" + ev.msg + "</b>";
         state.stats.temp += (ev.effect.temp || 0);
         state.stats.press = Math.max(0, state.stats.press + (ev.effect.press || 0));
         state.stats.bio = Math.max(0, state.stats.bio + (ev.effect.bio || 0));
         if (typeof SFX !== "undefined") SFX.alert();
       }
     } else {
-      statusMsg = ev.msg;
+      eventHtml = "🎉 <b>" + ev.msg + "</b>";
       if (ev.budget) state.budget += ev.budget;
     }
   }
 
-  setLog(statusMsg);
-
+  // 파산 / 납기 초과 체크
   if (state.budget < 0) {
     if (typeof SFX !== "undefined") SFX.alert();
     alert("[해고 통보] 프로젝트 예산 파산으로 징계 해고되었습니다!");
@@ -301,8 +302,30 @@ function nextDay() {
     return;
   }
 
+  // 정산 팝업 모달 표시
+  document.getElementById("report-title").textContent = "[" + finishedDay + "일차 퇴근 정산 보고서]";
+  document.getElementById("report-content").innerHTML =
+    '<div class="report-section">' +
+      '<strong>■ 행성 환경 변화</strong><br>' + changeHtml + '<br>' +
+      '현재 지구 유사율: <strong style="color:#00f0ff;">' + calculateESI().toFixed(1) + '%</strong>' +
+    '</div>' +
+    '<div class="report-section">' +
+      '<strong>■ 일일 예산 정산</strong> (가동 설비 ' + activeCount + '기)<br>' +
+      '본사 지원금: <span style="color:#33ff77;">+' + p.dailyGrant + ' Cr</span> / 유지비: <span style="color:#ff5555;">-' + dailyUpkeep + ' Cr</span><br>' +
+      '순수익: <strong>' + (net >= 0 ? '+' : '') + net + ' Cr</strong> (잔여 예산: ' + state.budget + ' Cr)' +
+    '</div>' +
+    '<div class="report-boss">' + eventHtml + '</div>';
+
+  document.getElementById("report-modal").classList.remove("hidden");
+  setLog(state.day + "일차 근무 개시. (유사율 " + calculateESI().toFixed(1) + "%)");
+
   saveGame();
   updateUI();
+}
+
+function closeReport() {
+  if (typeof SFX !== "undefined") SFX.click();
+  document.getElementById("report-modal").classList.add("hidden");
 }
 
 function completeProject() {
@@ -316,9 +339,8 @@ function completeProject() {
   state.rankIdx = Math.min(RANKS.length - 1, state.rankIdx + 1);
   const nextRank = RANKS[state.rankIdx];
 
-  // 10번째 행성(인덱스 9) 클리어 시 최종 엔딩 화면 출력
   if (state.planetIdx === PLANETS.length - 1) {
-    state.rankIdx = RANKS.length - 1; // 이사 직급 부여
+    state.rankIdx = RANKS.length - 1;
     const endScreen = document.getElementById("ending-screen");
     const endSummary = document.getElementById("ending-summary");
     if (endSummary) {
@@ -424,7 +446,6 @@ function updateUI() {
     }
     listEl.appendChild(card);
   });
-
-  if (typeof drawPlanet === "function") drawPlanet(state.stats);
-  if (typeof drawRadar === "function") drawRadar(state.stats);
+if (typeof drawPlanet === "function") drawPlanet(state.stats);
+if (typeof drawRadar === "function") drawRadar(state.stats);
 }
