@@ -84,11 +84,11 @@ body {
   cursor: pointer;
 }
 
-/* 행성 뷰포트 */
+/* 행성 뷰포트 (행성 크기 확대 반영) */
 #viewport-section {
   position: relative;
   flex: 1;
-  min-height: 110px;
+  min-height: 185px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -110,8 +110,8 @@ body {
 
 #planet-canvas {
   image-rendering: pixelated;
-  width: 135px;
-  height: 135px;
+  width: 195px;
+  height: 195px;
 }
 
 #complete-btn {
@@ -141,8 +141,8 @@ body {
 }
 
 #radar-canvas {
-  width: 90px;
-  height: 90px;
+  width: 115px;
+  height: 115px;
 }
 
 #params-list {
@@ -193,11 +193,11 @@ body {
 #log-message {
   color: #d0f5e0;
   line-height: 1.35;
-  min-height: 28px;
+  min-height: 26px;
   word-break: keep-all;
 }
 
-/* 하단 컨트롤 바 */
+/* 하단 컨트롤 바 (14종 설비 스크롤 최적화) */
 #control-panel {
   display: flex;
   flex-direction: column;
@@ -208,7 +208,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
-  max-height: 175px;
+  max-height: 155px;
   overflow-y: auto;
 }
 
