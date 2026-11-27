@@ -373,3 +373,13 @@ body {
   border-color: #ff4444;
   box-shadow: 0 0 20px rgba(255, 68, 68, 0.35);
 }
+#reset-save-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  background: #1a242b;
+  color: #88ccaa;
+  border: 1px solid #2b6648;
+  font-size: 11px;
+  cursor: pointer;
+}
