@@ -9,6 +9,8 @@ let state = {
   unreadMail: true
 };
 
+let typingTimer = null;
+
 function initPlanet(idx) {
   const p = PLANETS[idx % PLANETS.length];
   state.planetIdx = idx;
@@ -30,7 +32,17 @@ function initPlanet(idx) {
 
 function setLog(msg) {
   const el = document.getElementById("log-message");
-  if (el) el.innerText = msg;
+  if (!el) return;
+  if (typingTimer) clearInterval(typingTimer);
+
+  el.innerText = "";
+  let i = 0;
+  typingTimer = setInterval(() => {
+    el.innerText += msg.charAt(i);
+    if (i % 2 === 0 && typeof SFX !== "undefined" && SFX.type) SFX.type();
+    i++;
+    if (i >= msg.length) clearInterval(typingTimer);
+  }, 22);
 }
 
 function getDefenseRate() {
@@ -84,6 +96,17 @@ function toggleFacility(id) {
   updateUI();
 }
 
+function scrapFacility(id) {
+  if (state.owned[id].count === 0) return;
+  const fac = FACILITIES.find(f => f.id === id);
+  const refund = Math.floor(fac.cost * 0.5);
+  state.owned[id].count--;
+  state.budget += refund;
+  if (typeof SFX !== "undefined" && SFX.scrap) SFX.scrap();
+  setLog("[설비 철거] " + fac.name + " 해체 완료. (+" + refund + " Cr 환수)");
+  updateUI();
+}
+
 function openMail() {
   if (typeof SFX !== "undefined") SFX.click();
   state.unreadMail = false;
@@ -126,7 +149,6 @@ function claimQuest(qId) {
   openMail();
   updateUI();
 }
-
 function nextDay() {
   const p = PLANETS[state.planetIdx % PLANETS.length];
   let dailyUpkeep = 0;
@@ -203,9 +225,20 @@ function completeProject() {
   if (esi < 97) return;
 
   if (typeof SFX !== "undefined") SFX.win();
+  const grade = esi >= 99 ? "S등급 (초과 달성 인센티브)" : "A등급 (정상 완료)";
   const bonus = esi >= 99 ? 350 : 150;
+  const prevRank = RANKS[state.rankIdx];
   state.rankIdx = Math.min(RANKS.length - 1, state.rankIdx + 1);
-  alert("[프로젝트 성공!] 최종 지구 유사율 " + esi.toFixed(1) + "%\n성과 보너스 +" + bonus + " Cr 획득 및 '" + RANKS[state.rankIdx] + "' 승진!");
+  const nextRank = RANKS[state.rankIdx];
+
+  alert(
+    "=== [테라-코프 인사 발령장] ===\n\n" +
+    "평가 등급: " + grade + "\n" +
+    "최종 유사율: " + esi.toFixed(1) + "%\n" +
+    "성과 보너스: +" + bonus + " Cr\n" +
+    "직급 변경: " + prevRank + " -> " + nextRank + "\n\n" +
+    "다음 개조 행성으로 이동합니다."
+  );
   initPlanet(state.planetIdx + 1);
 }
 
@@ -216,6 +249,13 @@ function updateUI() {
   document.getElementById("day-counter").innerText = "D-" + state.day + "/" + p.deadline;
   document.getElementById("budget-val").innerText = state.budget;
   document.getElementById("shield-status").innerText = "재해 방어율: " + getDefenseRate() + "%";
+
+  const frame = document.getElementById("monitor-frame");
+  if (state.budget < 80 || (p.deadline - state.day) <= 5) {
+    frame.classList.add("danger-alert");
+  } else {
+    frame.classList.remove("danger-alert");
+  }
 
   const dotEl = document.getElementById("mail-dot");
   if (state.unreadMail) dotEl.classList.remove("hidden");
@@ -270,11 +310,15 @@ function updateUI() {
         '<button onclick="buildFacility(\'' + f.id + '\')">건설</button>' +
         '<button class="' + (owned.active ? '' : 'off') + '" onclick="toggleFacility(\'' + f.id + '\')">' +
         (owned.count === 0 ? '-' : (owned.active ? 'ON' : 'OFF')) +
-        '</button></div>';
+        '</button>' +
+        '<button onclick="scrapFacility(\'' + f.id + '\')" style="color:#ffcc00; border-color:#ffcc00;">철거</button>' +
+        '</div>';
     }
     listEl.appendChild(card);
   });
-if (typeof drawPlanet === "function") drawPlanet(state.stats);
-if (typeof drawRadar === "function") drawRadar(state.stats);
+
+  if (typeof drawPlanet === "function") drawPlanet(state.stats);
+  if (typeof drawRadar === "function") drawRadar(state.stats);
 }
+
 initPlanet(0);
