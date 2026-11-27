@@ -1,8 +1,8 @@
 let rotOffset = 0;
-let animFrameId = null;
+let renderTimer = null;
 
 const STARS = [];
-for (let i = 0; i < 42; i++) {
+for (let i = 0; i < 45; i++) {
   STARS.push({
     x: Math.floor(Math.random() * 55) * 4,
     y: Math.floor(Math.random() * 55) * 4,
@@ -11,20 +11,13 @@ for (let i = 0; i < 42; i++) {
 }
 
 function startRenderLoop() {
-  if (animFrameId) cancelAnimationFrame(animFrameId);
-  let lastTime = 0;
-
-  function loop(time) {
-    if (time - lastTime > 180) {
-      rotOffset += 0.12;
-      if (typeof state !== "undefined" && state.stats) {
-        drawPlanet(state.stats);
-      }
-      lastTime = time;
+  if (renderTimer) clearInterval(renderTimer);
+  renderTimer = setInterval(function() {
+    rotOffset += 0.12;
+    if (typeof state !== "undefined" && state.stats) {
+      drawPlanet(state.stats);
     }
-    animFrameId = requestAnimationFrame(loop);
-  }
-  animFrameId = requestAnimationFrame(loop);
+  }, 180);
 }
 
 function drawPlanet(stats) {
@@ -34,7 +27,7 @@ function drawPlanet(stats) {
   const size = 220;
   const cx = 110;
   const cy = 110;
-  const radius = 84; // 행성 반지름 대폭 확대
+  const radius = 92; // 캔버스를 거의 꽉 채우는 크기
   const pixelSize = 4;
 
   ctx.clearRect(0, 0, size, size);
@@ -66,7 +59,7 @@ function drawPlanet(stats) {
         const nx = x + rotOffset * 14;
         const noise = (Math.sin(nx * 0.065) + Math.cos(y * 0.065) + Math.sin((nx + y) * 0.04) + 3) * 16.6;
         const cloudNoise = (Math.sin((nx * 1.4) * 0.075) + Math.cos(y * 0.09) + 2) * 25;
-        const shade = (dx + dy > 36) ? 0.6 : 1.0;
+        const shade = (dx + dy > 40) ? 0.6 : 1.0;
 
         let r = 160, g = 82, b = 45;
         if (stats.temp < -15 && noise < stats.water + 15) {
@@ -97,7 +90,7 @@ function drawRadar(stats) {
   const canvas = document.getElementById("radar-canvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
-  const cx = 68, cy = 70, maxR = 44;
+  const cx = 68, cy = 70, maxR = 42;
 
   ctx.clearRect(0, 0, 136, 136);
 
@@ -110,7 +103,7 @@ function drawRadar(stats) {
     Math.max(0, Math.min(1, stats.bio / 160))
   ];
 
-  // 외곽 최대 범위 오각형 가이드선
+  // 외곽 가이드선
   ctx.strokeStyle = "#132e20";
   ctx.beginPath();
   for (let i = 0; i < 5; i++) {
@@ -123,7 +116,7 @@ function drawRadar(stats) {
   ctx.closePath();
   ctx.stroke();
 
-  // 지구 목표 기준선 (0.5 반지름)
+  // 지구 목표 기준선
   ctx.strokeStyle = "#2b6648";
   ctx.beginPath();
   for (let i = 0; i < 5; i++) {
@@ -152,15 +145,15 @@ function drawRadar(stats) {
   ctx.fill();
   ctx.stroke();
 
-  // 오각형 각 꼭짓점 이름 라벨 그리기
+  // 오각형 각 꼭짓점 이름 라벨
   ctx.fillStyle = "#88ccaa";
   ctx.font = "10px 'Galmuri11', monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (let i = 0; i < 5; i++) {
     const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
-    const lx = cx + Math.cos(angle) * (maxR + 14);
-    const ly = cy + Math.sin(angle) * (maxR + 14);
+    const lx = cx + Math.cos(angle) * (maxR + 15);
+    const ly = cy + Math.sin(angle) * (maxR + 15);
     ctx.fillText(labels[i], lx, ly);
   }
 }
