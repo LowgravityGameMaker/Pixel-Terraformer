@@ -1,3 +1,5 @@
+const SAVE_KEY = "terra_corp_save_v1";
+
 let state = {
   rankIdx: 0,
   planetIdx: 0,
@@ -11,11 +13,50 @@ let state = {
 
 let typingTimer = null;
 
-// 인트로 출근 버튼 클릭 시 실행
+// 페이지 열릴 때 저장 데이터 확인
+window.addEventListener("DOMContentLoaded", function() {
+  const saved = localStorage.getItem(SAVE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      const rankName = RANKS[parsed.rankIdx] || "인턴";
+      const pName = PLANETS[parsed.planetIdx % PLANETS.length].name;
+      const btn = document.getElementById("start-work-btn");
+      const resetBtn = document.getElementById("reset-save-btn");
+      if (btn) btn.textContent = "[이어서 근무하기: " + rankName + " / " + pName + " ▶]";
+      if (resetBtn) resetBtn.classList.remove("hidden");
+    } catch (e) {}
+  }
+});
+
+function saveGame() {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+function resetSaveData() {
+  if (confirm("저장된 직급과 행성 진행 기록을 초기화하고 인턴부터 다시 시작할까요?")) {
+    localStorage.removeItem(SAVE_KEY);
+    location.reload();
+  }
+}
+
 function startWork() {
   if (typeof SFX !== "undefined") SFX.win();
   const intro = document.getElementById("intro-screen");
   if (intro) intro.classList.add("hidden");
+
+  const saved = localStorage.getItem(SAVE_KEY);
+  if (saved) {
+    try {
+      state = JSON.parse(saved);
+      setLog("[복귀 완료] 이전 관제 기록을 불러왔습니다. (" + RANKS[state.rankIdx] + ")");
+      updateUI();
+      if (typeof startRenderLoop === "function") startRenderLoop();
+      return;
+    } catch (e) {}
+  }
   initPlanet(0);
 }
 
@@ -33,6 +74,7 @@ function initPlanet(idx) {
     state.owned[f.id] = { count: 0, active: true };
   });
 
+  saveGame();
   setLog("[출근 완료] " + p.name + ": " + p.desc);
   updateUI();
   if (typeof startRenderLoop === "function") startRenderLoop();
@@ -90,6 +132,7 @@ function buildFacility(id) {
     if (!state.owned[id]) state.owned[id] = { count: 0, active: true };
     state.owned[id].count += 1;
     state.owned[id].active = true;
+    saveGame();
     if (typeof SFX !== "undefined") SFX.build();
     setLog("[설비 가동] " + fac.name + " 건설 완료! (퇴근 시 효과 적용)");
     updateUI();
@@ -102,6 +145,7 @@ function buildFacility(id) {
 function toggleFacility(id) {
   if (!state.owned[id] || state.owned[id].count === 0) return;
   state.owned[id].active = !state.owned[id].active;
+  saveGame();
   if (typeof SFX !== "undefined") SFX.click();
   setLog("[전원 제어] 설비 상태를 " + (state.owned[id].active ? "ON" : "OFF") + "으로 전환했습니다.");
   updateUI();
@@ -113,6 +157,7 @@ function scrapFacility(id) {
   const refund = Math.floor(fac.cost * 0.5);
   state.owned[id].count -= 1;
   state.budget += refund;
+  saveGame();
   if (typeof SFX !== "undefined" && SFX.scrap) SFX.scrap();
   setLog("[설비 철거] " + fac.name + " 해체 완료. (+" + refund + " Cr 환수)");
   updateUI();
@@ -121,11 +166,12 @@ function scrapFacility(id) {
 function openMail() {
   if (typeof SFX !== "undefined") SFX.click();
   state.unreadMail = false;
+  saveGame();
   document.getElementById("mail-dot").classList.add("hidden");
   const content = document.getElementById("mail-content");
   const p = PLANETS[state.planetIdx % PLANETS.length];
 
-  let html = '<div class="mail-item"><strong>발신: 본사 인사/관제팀</strong><br>현재 배정 행성: <b>' + p.name + '</b><br>납기일(' + p.deadline + '일) 내 지구 유사율 95% 이상 달성 요망.</div>';
+  let html = '<div class="mail-item"><strong>발신: 본사 인사/관제팀</strong><br>현재 배정 행성: <b>' + p.name + '</b><br>납기일(' + p.deadline + '일) 내 지구 유사율 93% 이상 달성 요망.</div>';
 
   QUESTS.forEach(function(q) {
     const isDone = state.completedQuests.includes(q.id);
@@ -155,6 +201,7 @@ function claimQuest(qId) {
   if (!q || state.completedQuests.includes(qId)) return;
   state.completedQuests.push(qId);
   state.budget += q.reward;
+  saveGame();
   if (typeof SFX !== "undefined") SFX.win();
   setLog("[퀘스트 보상] " + q.title + " 달성! +" + q.reward + " Cr 입금.");
   openMail();
@@ -235,16 +282,17 @@ function nextDay() {
     return;
   }
 
+  saveGame();
   updateUI();
 }
 
 function completeProject() {
   const esi = calculateESI();
-  if (esi < 95) return;
+  if (esi < 93) return;
 
   if (typeof SFX !== "undefined") SFX.win();
-  const grade = esi >= 98 ? "S등급 (초과 달성 인센티브)" : "A등급 (정상 완료)";
-  const bonus = esi >= 98 ? 350 : 150;
+  const grade = esi >= 97 ? "S등급 (초과 달성 인센티브)" : "A등급 (정상 완료)";
+  const bonus = esi >= 97 ? 350 : 150;
   const prevRank = RANKS[state.rankIdx];
   state.rankIdx = Math.min(RANKS.length - 1, state.rankIdx + 1);
   const nextRank = RANKS[state.rankIdx];
@@ -307,7 +355,7 @@ function updateUI() {
   const esi = calculateESI();
   document.getElementById("esi-val").textContent = esi.toFixed(1);
   const compBtn = document.getElementById("complete-btn");
-  if (esi >= 95) compBtn.classList.remove("hidden");
+  if (esi >= 93) compBtn.classList.remove("hidden");
   else compBtn.classList.add("hidden");
 
   const listEl = document.getElementById("facility-list");
