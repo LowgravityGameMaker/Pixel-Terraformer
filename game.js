@@ -11,6 +11,14 @@ let state = {
 
 let typingTimer = null;
 
+// 인트로 출근 버튼 클릭 시 실행
+function startWork() {
+  if (typeof SFX !== "undefined") SFX.win();
+  const intro = document.getElementById("intro-screen");
+  if (intro) intro.classList.add("hidden");
+  initPlanet(0);
+}
+
 function initPlanet(idx) {
   const p = PLANETS[idx % PLANETS.length];
   state.planetIdx = idx;
@@ -25,7 +33,7 @@ function initPlanet(idx) {
     state.owned[f.id] = { count: 0, active: true };
   });
 
-  setLog("[배정] " + p.name + ": " + p.desc);
+  setLog("[출근 완료] " + p.name + ": " + p.desc);
   updateUI();
   if (typeof startRenderLoop === "function") startRenderLoop();
 }
@@ -330,5 +338,3 @@ function updateUI() {
   if (typeof drawPlanet === "function") drawPlanet(state.stats);
   if (typeof drawRadar === "function") drawRadar(state.stats);
 }
-
-initPlanet(0);
