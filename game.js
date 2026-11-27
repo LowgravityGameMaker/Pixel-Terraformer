@@ -2,7 +2,7 @@ let state = {
   rankIdx: 0,
   planetIdx: 0,
   day: 1,
-  budget: 400,
+  budget: 420,
   stats: { temp: -35, press: 20, water: 10, o2: 2, bio: 0 },
   owned: {},
   completedQuests: [],
@@ -117,7 +117,7 @@ function openMail() {
   const content = document.getElementById("mail-content");
   const p = PLANETS[state.planetIdx % PLANETS.length];
 
-  let html = '<div class="mail-item"><strong>발신: 본사 인사/관제팀</strong><br>현재 배정 행성: <b>' + p.name + '</b><br>납기일(' + p.deadline + '일) 내 지구 유사율 97% 이상 달성 요망.</div>';
+  let html = '<div class="mail-item"><strong>발신: 본사 인사/관제팀</strong><br>현재 배정 행성: <b>' + p.name + '</b><br>납기일(' + p.deadline + '일) 내 지구 유사율 95% 이상 달성 요망.</div>';
 
   QUESTS.forEach(q => {
     const isDone = state.completedQuests.includes(q.id);
@@ -232,11 +232,11 @@ function nextDay() {
 
 function completeProject() {
   const esi = calculateESI();
-  if (esi < 97) return;
+  if (esi < 95) return;
 
   if (typeof SFX !== "undefined") SFX.win();
-  const grade = esi >= 99 ? "S등급 (초과 달성 인센티브)" : "A등급 (정상 완료)";
-  const bonus = esi >= 99 ? 350 : 150;
+  const grade = esi >= 98 ? "S등급 (초과 달성 인센티브)" : "A등급 (정상 완료)";
+  const bonus = esi >= 98 ? 350 : 150;
   const prevRank = RANKS[state.rankIdx];
   state.rankIdx = Math.min(RANKS.length - 1, state.rankIdx + 1);
   const nextRank = RANKS[state.rankIdx];
@@ -299,7 +299,7 @@ function updateUI() {
   const esi = calculateESI();
   document.getElementById("esi-val").textContent = esi.toFixed(1);
   const compBtn = document.getElementById("complete-btn");
-  if (esi >= 97) compBtn.classList.remove("hidden");
+  if (esi >= 95) compBtn.classList.remove("hidden");
   else compBtn.classList.add("hidden");
 
   const listEl = document.getElementById("facility-list");
