@@ -16,8 +16,22 @@ function playTone(freq, type, duration) {
 
 const SFX = {
   click: () => playTone(600, 'square', 0.06),
-  build: () => { playTone(440, 'square', 0.08); setTimeout(() => playTone(660, 'square', 0.1), 80); },
-  nextDay: () => { playTone(330, 'triangle', 0.1); setTimeout(() => playTone(520, 'triangle', 0.15), 100); },
-  alert: () => { playTone(200, 'sawtooth', 0.2); setTimeout(() => playTone(160, 'sawtooth', 0.25), 180); },
-  win: () => { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.15), i * 110)); }
+  build: () => {
+    playTone(440, 'square', 0.08);
+    setTimeout(() => playTone(660, 'square', 0.1), 80);
+  },
+  nextDay: () => {
+    playTone(330, 'triangle', 0.1);
+    setTimeout(() => playTone(520, 'triangle', 0.15), 100);
+  },
+  alert: () => {
+    playTone(200, 'sawtooth', 0.2);
+    setTimeout(() => playTone(160, 'sawtooth', 0.25), 180);
+  },
+  win: () => {
+    playTone(523, 'square', 0.12);
+    setTimeout(() => playTone(659, 'square', 0.12), 110);
+    setTimeout(() => playTone(784, 'square', 0.12), 220);
+    setTimeout(() => playTone(1046, 'square', 0.25), 330);
+  }
 };
