@@ -84,8 +84,86 @@ body {
   background: #33ff77;
   color: #05080a;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
+  cursor: pointer;
+}
+
+#reset-save-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  background: #1a242b;
+  color: #88ccaa;
+  border: 1px solid #2b6648;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* 최종 엔딩 화면 */
+#ending-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 8, 12, 0.95);
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+}
+
+.ending-box {
+  width: 100%;
+  border: 2px solid #ffcc00;
+  background: #0d161c;
+  padding: 22px 14px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+}
+
+.ending-badge {
+  font-size: 12px;
+  color: #ffcc00;
+  margin-bottom: 8px;
+}
+
+.ending-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 14px;
+}
+
+.ending-desc {
+  text-align: left;
+  background: #070d11;
+  border: 1px solid #554400;
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #ffe680;
+  margin-bottom: 16px;
+}
+
+#continue-endless-btn {
+  width: 100%;
+  padding: 11px;
+  background: #ffcc00;
+  color: #05080a;
+  border: none;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#restart-ending-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  background: #1a242b;
+  color: #ccc;
+  border: 1px solid #444;
+  font-size: 11px;
   cursor: pointer;
 }
 
@@ -148,12 +226,11 @@ body {
   font-weight: bold;
   cursor: pointer;
 }
-
 /* 행성 뷰포트 */
 #viewport-section {
   position: relative;
   flex: 1;
-  min-height: 190px;
+  min-height: 185px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -191,6 +268,7 @@ body {
 }
 
 .hidden { display: none !important; }
+
 /* 데이터 패널 */
 #data-panel {
   display: flex;
@@ -235,11 +313,11 @@ body {
   width: 50%;
 }
 
-/* 로그 창 */
+/* 로그 창 (퇴근 리포트 + 상사 메시지 표시를 위해 여유 확보) */
 #log-panel {
   background: #081014;
   border: 1px solid #1f4d36;
-  padding: 4px 6px;
+  padding: 5px 6px;
   margin: 4px 0;
   font-size: 11px;
   flex-shrink: 0;
@@ -248,12 +326,13 @@ body {
 #mail-header {
   color: #ffcc00;
   font-size: 10px;
+  margin-bottom: 2px;
 }
 
 #log-message {
   color: #d0f5e0;
-  line-height: 1.3;
-  min-height: 26px;
+  line-height: 1.35;
+  min-height: 36px;
   word-break: keep-all;
 }
 
@@ -266,7 +345,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
-  max-height: 140px;
+  max-height: 135px;
   overflow-y: auto;
 }
 
@@ -372,14 +451,4 @@ body {
 #monitor-frame.danger-alert {
   border-color: #ff4444;
   box-shadow: 0 0 20px rgba(255, 68, 68, 0.35);
-}
-#reset-save-btn {
-  width: 100%;
-  margin-top: 8px;
-  padding: 8px;
-  background: #1a242b;
-  color: #88ccaa;
-  border: 1px solid #2b6648;
-  font-size: 11px;
-  cursor: pointer;
 }
