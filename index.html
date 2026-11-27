@@ -4,81 +4,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TERRA-CORP OS</title>
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
   <div id="monitor-frame">
-    <!-- 상단: 사원 정보 & 예산 바 & 퇴근 버튼 -->
+    <!-- 상단 바: 2줄 구성으로 겹침 완전 방지 -->
     <header id="top-bar">
-      <div class="info-group">
-        <span id="rank-badge">인턴</span>
-        <span id="planet-name">P-01</span>
+      <div class="top-row">
+        <div>
+          <span id="rank-badge">인턴</span>
+          <strong id="planet-name">P-01 아레스-미니</strong>
+        </div>
         <span id="day-counter">1일차 (마감 35일)</span>
       </div>
-      <div class="budget-group">
-        <span><strong id="budget-val">400</strong>Cr</span>
-        <span class="sub-text">(<span id="net-income">+65</span>)</span>
-        <button id="mail-btn" onclick="openMail()">✉<span id="mail-dot">!</span></button>
-        <button id="next-day-btn" onclick="nextDay()">퇴근▶</button>
+      <div class="top-row">
+        <div>
+          <span>예산: <strong id="budget-val">420</strong>Cr</span>
+          <span class="sub-text">(<span id="net-income">+65</span>)</span>
+        </div>
+        <div class="top-btns">
+          <button id="mail-btn" onclick="openMail()">✉메일<span id="mail-dot">!</span></button>
+          <button id="next-day-btn" onclick="nextDay()">퇴근▶</button>
+        </div>
       </div>
     </header>
 
-    <!-- 중단: 확대된 행성 뷰포트 + 지구 유사율 -->
+    <!-- 중단: 행성 뷰포트 -->
     <main id="viewport-section">
       <div id="esi-overlay">
-        지구 유사율 <span id="esi-val">12.0</span>% <span class="sub-text">(목표 95%)</span>
-        <div id="shield-status" class="sub-text">재해 방어율: 0%</div>
+        유사율 <strong id="esi-val">12.0</strong>% <span class="sub-text">(목표 95%)</span>
+        <div id="shield-status" class="sub-text">방어율: 0%</div>
       </div>
       <canvas id="planet-canvas" width="220" height="220"></canvas>
       <button id="complete-btn" class="hidden" onclick="completeProject()">[프로젝트 완료 보고]</button>
     </main>
 
-    <!-- 데이터 패널: 5대 핵심 지표 & 라벨 포함 레이더 차트 -->
+    <!-- 데이터 패널 -->
     <section id="data-panel">
       <div id="radar-box">
         <canvas id="radar-canvas" width="136" height="136"></canvas>
       </div>
       <div id="params-list">
-        <div class="param-row">
-          <span>온도</span>
-          <div class="bar-bg"><div id="bar-temp" class="bar-fill"></div></div>
-          <span id="val-temp">-35°C</span>
-        </div>
-        <div class="param-row">
-          <span>기압</span>
-          <div class="bar-bg"><div id="bar-press" class="bar-fill"></div></div>
-          <span id="val-press">20kPa</span>
-        </div>
-        <div class="param-row">
-          <span>수위</span>
-          <div class="bar-bg"><div id="bar-water" class="bar-fill"></div></div>
-          <span id="val-water">10%</span>
-        </div>
-        <div class="param-row">
-          <span>산소</span>
-          <div class="bar-bg"><div id="bar-o2" class="bar-fill"></div></div>
-          <span id="val-o2">2%</span>
-        </div>
-        <div class="param-row">
-          <span>생태</span>
-          <div class="bar-bg"><div id="bar-bio" class="bar-fill"></div></div>
-          <span id="val-bio">0%</span>
-        </div>
+        <div class="param-row"><span>온도</span><div class="bar-bg"><div id="bar-temp" class="bar-fill"></div></div><span id="val-temp">-35°C</span></div>
+        <div class="param-row"><span>기압</span><div class="bar-bg"><div id="bar-press" class="bar-fill"></div></div><span id="val-press">20kPa</span></div>
+        <div class="param-row"><span>수위</span><div class="bar-bg"><div id="bar-water" class="bar-fill"></div></div><span id="val-water">10%</span></div>
+        <div class="param-row"><span>산소</span><div class="bar-bg"><div id="bar-o2" class="bar-fill"></div></div><span id="val-o2">2%</span></div>
+        <div class="param-row"><span>생태</span><div class="bar-bg"><div id="bar-bio" class="bar-fill"></div></div><span id="val-bio">0%</span></div>
       </div>
     </section>
 
-    <!-- 사내 메신저 / 실시간 로그 창 -->
+    <!-- 로그 창 -->
     <section id="log-panel">
-      <div id="mail-header">[시스템 로그] 실시간 관제 수신</div>
+      <div id="mail-header">[시스템 로그]</div>
       <div id="log-message">관제 시스템 준비 완료.</div>
     </section>
 
-    <!-- 하단: 설비 컨트롤 바 -->
+    <!-- 하단 설비 창 -->
     <footer id="control-panel">
       <div id="facility-list"></div>
     </footer>
 
-    <!-- 사내 메일함 모달 팝업 -->
+    <!-- 메일함 팝업 -->
     <div id="mail-modal" class="modal hidden">
       <div class="modal-box">
         <div class="modal-title">
@@ -90,9 +76,9 @@
     </div>
   </div>
 
-  <script src="sound.js?v=12"></script>
-  <script src="data.js?v=12"></script>
-  <script src="render.js?v=12"></script>
-  <script src="game.js?v=12"></script>
+  <script src="sound.js?v=20"></script>
+  <script src="data.js?v=20"></script>
+  <script src="render.js?v=20"></script>
+  <script src="game.js?v=20"></script>
 </body>
 </html>
