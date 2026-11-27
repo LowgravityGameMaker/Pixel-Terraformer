@@ -30,25 +30,31 @@ body {
   flex-direction: column;
   justify-content: space-between;
   padding: 6px;
-  box-shadow: 0 0 20px rgba(51, 255, 119, 0.15);
 }
 
-/* 상단 바 & 퇴근 버튼 */
+/* 상단 바 (2줄 정렬로 깔끔하게 정리) */
 #top-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-bottom: 2px solid #1f4d36;
+  padding-bottom: 5px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.top-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #1f4d36;
-  padding-bottom: 4px;
-  font-size: 11px;
-  flex-shrink: 0;
 }
 
 #rank-badge {
   background: #33ff77;
   color: #0b141a;
-  padding: 1px 4px;
+  padding: 1px 5px;
   font-weight: bold;
+  margin-right: 4px;
 }
 
 .sub-text {
@@ -56,13 +62,17 @@ body {
   color: #88ccaa;
 }
 
+.top-btns {
+  display: flex;
+  gap: 5px;
+}
+
 #mail-btn {
-  position: relative;
   background: #14261c;
   color: #ffcc00;
   border: 1px solid #ffcc00;
-  padding: 2px 6px;
-  margin-left: 3px;
+  padding: 2px 7px;
+  font-size: 11px;
   cursor: pointer;
 }
 
@@ -73,30 +83,26 @@ body {
 }
 
 #next-day-btn {
-  display: inline-block;
-  padding: 2px 7px;
-  margin-left: 3px;
   background: #33ff77;
   color: #05080a;
   border: 1px solid #33ff77;
+  padding: 2px 9px;
   font-size: 11px;
   font-weight: bold;
   cursor: pointer;
 }
 
-/* 행성 뷰포트 (행성 크기 확대 반영) */
+/* 행성 뷰포트 (화면 중앙 큼직하게 차지) */
 #viewport-section {
   position: relative;
   flex: 1;
-  min-height: 185px;
+  min-height: 190px;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: #060b10;
   border: 1px solid #1f4d36;
   margin: 4px 0;
-  overflow: hidden;
 }
 
 #esi-overlay {
@@ -110,8 +116,8 @@ body {
 
 #planet-canvas {
   image-rendering: pixelated;
-  width: 195px;
-  height: 195px;
+  width: 210px;
+  height: 210px;
 }
 
 #complete-btn {
@@ -124,11 +130,11 @@ body {
   font-size: 12px;
   font-weight: bold;
   cursor: pointer;
-  animation: pulse 1s infinite;
   z-index: 2;
 }
 
 .hidden { display: none !important; }
+
 /* 데이터 패널 */
 #data-panel {
   display: flex;
@@ -141,8 +147,8 @@ body {
 }
 
 #radar-canvas {
-  width: 115px;
-  height: 115px;
+  width: 110px;
+  height: 110px;
 }
 
 #params-list {
@@ -171,14 +177,13 @@ body {
   height: 100%;
   background: #33ff77;
   width: 50%;
-  transition: width 0.3s;
 }
 
-/* 메신저 로그 */
+/* 로그 창 */
 #log-panel {
   background: #081014;
   border: 1px solid #1f4d36;
-  padding: 5px 6px;
+  padding: 4px 6px;
   margin: 4px 0;
   font-size: 11px;
   flex-shrink: 0;
@@ -186,21 +191,18 @@ body {
 
 #mail-header {
   color: #ffcc00;
-  margin-bottom: 2px;
   font-size: 10px;
 }
 
 #log-message {
   color: #d0f5e0;
-  line-height: 1.35;
+  line-height: 1.3;
   min-height: 26px;
   word-break: keep-all;
 }
 
-/* 하단 컨트롤 바 (14종 설비 스크롤 최적화) */
+/* 하단 설비 창 */
 #control-panel {
-  display: flex;
-  flex-direction: column;
   flex-shrink: 0;
 }
 
@@ -208,7 +210,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
-  max-height: 155px;
+  max-height: 140px;
   overflow-y: auto;
 }
 
@@ -217,9 +219,6 @@ body {
   border: 1px solid #2b6648;
   padding: 4px;
   font-size: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
 .fac-card.locked {
@@ -314,20 +313,7 @@ body {
   cursor: pointer;
 }
 
-/* 위험 경고 상태 */
 #monitor-frame.danger-alert {
   border-color: #ff4444;
   box-shadow: 0 0 20px rgba(255, 68, 68, 0.35);
-  animation: dangerBlink 1.2s infinite;
-}
-
-@keyframes dangerBlink {
-  0%, 100% { border-color: #ff4444; }
-  50% { border-color: #551111; }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.04); }
-  100% { transform: scale(1); }
 }
