@@ -4,24 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TERRA-CORP OS</title>
-  <link href="https://googleapis.com" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
   <div id="monitor-frame">
+    <!-- 상단: 사원 정보 & 예산 바 & 퇴근 버튼 -->
     <header id="top-bar">
       <div class="info-group">
         <span id="rank-badge">인턴</span>
         <span id="planet-name">P-01</span>
-        <span id="day-counter">D-1/35</span>
+        <span id="day-counter">1일차 (마감 35일)</span>
       </div>
       <div class="budget-group">
         <span><strong id="budget-val">400</strong>Cr</span>
         <span class="sub-text">(<span id="net-income">+65</span>)</span>
         <button id="mail-btn" onclick="openMail()">✉<span id="mail-dot">!</span></button>
+        <button id="next-day-btn" onclick="nextDay()">퇴근▶</button>
       </div>
     </header>
 
+    <!-- 중단: 행성 뷰포트 + 지구 유사율 -->
     <main id="viewport-section">
       <div id="esi-overlay">
         지구 유사율 <span id="esi-val">12.0</span>%
@@ -31,6 +33,7 @@
       <button id="complete-btn" class="hidden" onclick="completeProject()">[프로젝트 완료 보고]</button>
     </main>
 
+    <!-- 데이터 패널: 5대 핵심 지표 & 레이더 차트 -->
     <section id="data-panel">
       <div id="radar-box">
         <canvas id="radar-canvas" width="110" height="110"></canvas>
@@ -64,16 +67,18 @@
       </div>
     </section>
 
+    <!-- 사내 메신저 / 실시간 로그 창 -->
     <section id="log-panel">
       <div id="mail-header">[시스템 로그] 실시간 관제 수신</div>
       <div id="log-message">관제 시스템 준비 완료.</div>
     </section>
 
+    <!-- 하단: 설비 컨트롤 바 -->
     <footer id="control-panel">
       <div id="facility-list"></div>
-      <button id="next-day-btn" onclick="nextDay()">[퇴근 및 일일 정산 ▶]</button>
     </footer>
 
+    <!-- 사내 메일함 모달 팝업 -->
     <div id="mail-modal" class="modal hidden">
       <div class="modal-box">
         <div class="modal-title">
@@ -85,9 +90,9 @@
     </div>
   </div>
 
-  <script src="sound.js?v=7"></script>
-  <script src="data.js?v=7"></script>
-  <script src="render.js?v=7"></script>
-  <script src="game.js?v=7"></script>
+  <script src="sound.js?v=10"></script>
+  <script src="data.js?v=10"></script>
+  <script src="render.js?v=10"></script>
+  <script src="game.js?v=10"></script>
 </body>
 </html>
