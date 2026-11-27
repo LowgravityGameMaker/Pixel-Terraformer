@@ -1,4 +1,4 @@
-const SAVE_KEY = "terra_corp_save_v1";
+const SAVE_KEY = "terra_corp_save_v2";
 
 let state = {
   rankIdx: 0,
@@ -13,7 +13,6 @@ let state = {
 
 let typingTimer = null;
 
-// 페이지 열릴 때 저장 데이터 확인
 window.addEventListener("DOMContentLoaded", function() {
   const saved = localStorage.getItem(SAVE_KEY);
   if (saved) {
@@ -92,7 +91,7 @@ function setLog(msg) {
     if (i % 2 === 0 && typeof SFX !== "undefined" && SFX.type) SFX.type();
     i++;
     if (i >= msg.length) clearInterval(typingTimer);
-  }, 20);
+  }, 18);
 }
 
 function getDefenseRate() {
@@ -171,7 +170,7 @@ function openMail() {
   const content = document.getElementById("mail-content");
   const p = PLANETS[state.planetIdx % PLANETS.length];
 
-  let html = '<div class="mail-item"><strong>발신: 본사 인사/관제팀</strong><br>현재 배정 행성: <b>' + p.name + '</b><br>납기일(' + p.deadline + '일) 내 지구 유사율 93% 이상 달성 요망.</div>';
+  let html = '<div class="mail-item"><strong>발신: 본사 인사/관제팀</strong><br>현재 배정 행성: <b>' + p.name + '</b> (' + (state.planetIdx + 1) + '번째 프로젝트)<br>납기일(' + p.deadline + '일) 내 지구 유사율 93% 이상 달성 요망.</div>';
 
   QUESTS.forEach(function(q) {
     const isDone = state.completedQuests.includes(q.id);
@@ -210,12 +209,13 @@ function claimQuest(qId) {
 function nextDay() {
   const p = PLANETS[state.planetIdx % PLANETS.length];
   let dailyUpkeep = 0;
-  let activeCount = 0;
+
+  // 어제 수치 기록 (변화량 계산용)
+  const prev = Object.assign({}, state.stats);
 
   FACILITIES.forEach(function(f) {
     const item = state.owned[f.id];
     if (item && item.count > 0 && item.active) {
-      activeCount += item.count;
       dailyUpkeep += f.upkeep * item.count;
       state.stats.temp += (f.effect.temp || 0) * item.count;
       state.stats.press += (f.effect.press || 0) * item.count;
@@ -238,7 +238,26 @@ function nextDay() {
   state.day += 1;
   if (typeof SFX !== "undefined") SFX.nextDay();
 
-  let statusMsg = "[정산 완료] " + state.day + "일차 출근. 가동 설비 " + activeCount + "기 (순수익 " + (net >= 0 ? "+" : "") + net + "Cr)";
+  // 행성 변화량 문자열 생성
+  let changes = [];
+  const dTemp = state.stats.temp - prev.temp;
+  const dPress = state.stats.press - prev.press;
+  const dWater = state.stats.water - prev.water;
+  const dO2 = state.stats.o2 - prev.o2;
+  const dBio = state.stats.bio - prev.bio;
+
+  if (dTemp !== 0) changes.push("온도" + (dTemp > 0 ? "+" : "") + dTemp + "°C");
+  if (dPress !== 0) changes.push("기압" + (dPress > 0 ? "+" : "") + dPress);
+  if (dWater !== 0) changes.push("수위" + (dWater > 0 ? "+" : "") + dWater + "%");
+  if (dO2 !== 0) changes.push("산소" + (dO2 > 0 ? "+" : "") + dO2 + "%");
+  if (dBio !== 0) changes.push("생태" + (dBio > 0 ? "+" : "") + dBio + "%");
+
+  const changeReport = changes.length > 0 ? "[" + changes.join(", ") + "]" : "[변화 없음]";
+  const randomBoss = (typeof BOSS_MESSAGES !== "undefined")
+    ? BOSS_MESSAGES[Math.floor(Math.random() * BOSS_MESSAGES.length)]
+    : "";
+
+  let statusMsg = state.day + "일차 정산 " + changeReport + " | " + randomBoss;
 
   const hasClaimable = QUESTS.some(function(q) { return !state.completedQuests.includes(q.id) && q.check(state.stats); });
   if (hasClaimable) {
@@ -297,6 +316,23 @@ function completeProject() {
   state.rankIdx = Math.min(RANKS.length - 1, state.rankIdx + 1);
   const nextRank = RANKS[state.rankIdx];
 
+  // 10번째 행성(인덱스 9) 클리어 시 최종 엔딩 화면 출력
+  if (state.planetIdx === PLANETS.length - 1) {
+    state.rankIdx = RANKS.length - 1; // 이사 직급 부여
+    const endScreen = document.getElementById("ending-screen");
+    const endSummary = document.getElementById("ending-summary");
+    if (endSummary) {
+      endSummary.innerHTML =
+        "최종 직급: <strong>테라-코프 명예 이사</strong><br>" +
+        "완수한 행성: <strong>총 " + PLANETS.length + "개 행성 테라포밍 성공</strong><br>" +
+        "최종 프로젝트 평가: <strong>" + grade + " (" + esi.toFixed(1) + "%)</strong><br><br>" +
+        "인턴으로 입사해 수없이 많은 야근과 우주 재해를 뚫고 10개의 죽은 행성을 푸른 낙원으로 바꿨습니다. 당신은 이제 전설입니다!";
+    }
+    if (endScreen) endScreen.classList.remove("hidden");
+    initPlanet(state.planetIdx + 1);
+    return;
+  }
+
   alert(
     "=== [테라-코프 인사 발령장] ===\n\n" +
     "평가 등급: " + grade + "\n" +
@@ -306,6 +342,12 @@ function completeProject() {
     "다음 개조 행성으로 이동합니다."
   );
   initPlanet(state.planetIdx + 1);
+}
+
+function closeEnding() {
+  if (typeof SFX !== "undefined") SFX.click();
+  const endScreen = document.getElementById("ending-screen");
+  if (endScreen) endScreen.classList.add("hidden");
 }
 
 function updateUI() {
