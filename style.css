@@ -333,3 +333,18 @@ body {
   50% { transform: scale(1.04); }
   100% { transform: scale(1); }
 }
+/* 퇴근 버튼 하단 고정 및 설비창 스크롤 최적화 */
+#facility-list {
+  max-height: 115px !important;
+  overflow-y: auto !important;
+}
+
+#next-day-btn {
+  display: block !important;
+  width: 100% !important;
+  padding: 10px !important;
+  background: #33ff77 !important;
+  color: #05080a !important;
+  font-weight: bold !important;
+  margin-top: 4px !important;
+}
