@@ -44,20 +44,25 @@ const PLANETS = [
 ];
 
 const FACILITIES = [
-  { id: "heater", name: "열핵 히터", unlockRank: 0, cost: 85, upkeep: 7, desc: "온도 +4°C", effect: { temp: 4, press: 0, water: 0, o2: 0, bio: 0, shield: 0 } },
-  { id: "cryo_vent", name: "극저온 냉각탑", unlockRank: 0, cost: 90, upkeep: 8, desc: "온도 -4°C", effect: { temp: -4, press: 0, water: 0, o2: 0, bio: 0, shield: 0 } },
+  // [인턴 해금 - 기초 (+ / - 균형 설비)]
+  { id: "heater", name: "열핵 히터", unlockRank: 0, cost: 85, upkeep: 7, desc: "온도 +4°C, 수위 -1%", effect: { temp: 4, press: 0, water: -1, o2: 0, bio: 0, shield: 0 } },
+  { id: "cryo_vent", name: "극저온 냉각탑", unlockRank: 0, cost: 90, upkeep: 8, desc: "온도 -4°C, 기압 -1", effect: { temp: -4, press: -1, water: 0, o2: 0, bio: 0, shield: 0 } },
   { id: "pressurizer", name: "가스 방출기", unlockRank: 0, cost: 95, upkeep: 8, desc: "기압 +6kPa, 온도 +1", effect: { temp: 1, press: 6, water: 0, o2: 0, bio: 0, shield: 0 } },
-  { id: "comet", name: "얼음 혜성 유도", unlockRank: 0, cost: 135, upkeep: 7, desc: "수위 +5%, 기압 +2", effect: { temp: -1, press: 2, water: 5, o2: 0, bio: 0, shield: 0 } },
+  { id: "vac_pump", name: "대기 진공 펌프", unlockRank: 0, cost: 100, upkeep: 8, desc: "기압 -6kPa, 온도 -1", effect: { temp: -1, press: -6, water: 0, o2: 0, bio: 0, shield: 0 } },
+  { id: "comet", name: "얼음 혜성 유도", unlockRank: 0, cost: 130, upkeep: 7, desc: "수위 +5%, 온도 -1", effect: { temp: -1, press: 2, water: 5, o2: 0, bio: 0, shield: 0 } },
+  { id: "evaporator", name: "초고열 증발기", unlockRank: 0, cost: 110, upkeep: 8, desc: "수위 -5%, 기압 +3", effect: { temp: 2, press: 3, water: -5, o2: 0, bio: 0, shield: 0 } },
   { id: "moss", name: "이끼 살포기", unlockRank: 0, cost: 115, upkeep: 9, desc: "생태 +4%, 산소 +1%", effect: { temp: 0, press: 0, water: 0, o2: 1, bio: 4, shield: 0 } },
-  { id: "algae_tank", name: "조류 산소 배양소", unlockRank: 0, cost: 130, upkeep: 10, desc: "산소 +3%, 수위 -1%", effect: { temp: 0, press: 0, water: -1, o2: 3, bio: 1, shield: 0 } },
+  { id: "carbon_burner", name: "탄소 연소로", unlockRank: 0, cost: 105, upkeep: 7, desc: "산소 -3%, 온도 +5°C", effect: { temp: 5, press: 2, water: 0, o2: -3, bio: -1, shield: 0 } },
 
-  { id: "orbital_mirror", name: "궤도 반사 거울", unlockRank: 1, cost: 150, upkeep: 11, desc: "온도 +8°C, 수위 -1%", effect: { temp: 8, press: 0, water: -1, o2: 0, bio: 0, shield: 0 } },
-  { id: "cooler", name: "궤도 차양막", unlockRank: 1, cost: 150, upkeep: 11, desc: "온도 -8°C", effect: { temp: -8, press: 0, water: 0, o2: 0, bio: 0, shield: 0 } },
-  { id: "ice_drill", name: "지하 빙하 시추기", unlockRank: 1, cost: 165, upkeep: 12, desc: "수위 +8%, 온도 -1", effect: { temp: -1, press: 0, water: 8, o2: 0, bio: 0, shield: 0 } },
+  // [사원 해금 - 중급 정밀 제어]
+  { id: "orbital_mirror", name: "궤도 반사 거울", unlockRank: 1, cost: 150, upkeep: 11, desc: "온도 +8°C, 수위 -2%", effect: { temp: 8, press: 0, water: -2, o2: 0, bio: 0, shield: 0 } },
+  { id: "cooler", name: "궤도 차양막", unlockRank: 1, cost: 150, upkeep: 11, desc: "온도 -8°C, 생태 -1%", effect: { temp: -8, press: 0, water: 0, o2: 0, bio: -1, shield: 0 } },
+  { id: "algae_tank", name: "조류 산소 배양소", unlockRank: 1, cost: 145, upkeep: 11, desc: "산소 +4%, 수위 -2%", effect: { temp: 0, press: 0, water: -2, o2: 4, bio: 1, shield: 0 } },
   { id: "forest", name: "유전자 숲 플랜트", unlockRank: 1, cost: 185, upkeep: 15, desc: "생태 +7%, 산소 +3%", effect: { temp: 0, press: 0, water: -1, o2: 3, bio: 7, shield: 0 } },
 
-  { id: "atmo_stripper", name: "대기 제거 플랜트", unlockRank: 2, cost: 210, upkeep: 16, desc: "기압 -12kPa, 온도 -2", effect: { temp: -2, press: -12, water: 0, o2: 0, bio: 0, shield: 0 } },
-  { id: "soil_microbe", name: "독성 분해 미생물", unlockRank: 2, cost: 200, upkeep: 14, desc: "생태 +10%, 기압 +2", effect: { temp: 0, press: 2, water: 0, o2: 1, bio: 10, shield: 0 } },
+  // [대리 이상 해금 - 거대 공학]
+  { id: "atmo_stripper", name: "대기 제거 플랜트", unlockRank: 2, cost: 210, upkeep: 16, desc: "기압 -14kPa, 온도 -2", effect: { temp: -2, press: -14, water: 0, o2: -1, bio: 0, shield: 0 } },
+  { id: "bio_harvester", name: "생태 자원 추출기", unlockRank: 2, cost: 180, upkeep: 5, desc: "생태 -6%, 기압 -4kPa", effect: { temp: 0, press: -4, water: -2, o2: -2, bio: -6, shield: 0 } },
   { id: "mag_shield", name: "인공 자기장 방패", unlockRank: 2, cost: 240, upkeep: 18, desc: "방어 +35%, 기압 +1", effect: { temp: 0, press: 1, water: 0, o2: 0, bio: 0, shield: 35 } },
   { id: "bio_dome", name: "초거대 생태계 돔", unlockRank: 3, cost: 300, upkeep: 22, desc: "생태 +12%, 산소 +5%", effect: { temp: 1, press: 2, water: 0, o2: 5, bio: 12, shield: 10 } }
 ];
