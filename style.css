@@ -33,7 +33,7 @@ body {
   box-shadow: 0 0 20px rgba(51, 255, 119, 0.15);
 }
 
-/* 상단 바 */
+/* 상단 바 & 퇴근 버튼 */
 #top-bar {
   display: flex;
   justify-content: space-between;
@@ -62,7 +62,7 @@ body {
   color: #ffcc00;
   border: 1px solid #ffcc00;
   padding: 2px 6px;
-  margin-left: 4px;
+  margin-left: 3px;
   cursor: pointer;
 }
 
@@ -72,7 +72,19 @@ body {
   margin-left: 2px;
 }
 
-/* 행성 뷰포트 (높이 자동 축소 허용) */
+#next-day-btn {
+  display: inline-block;
+  padding: 2px 7px;
+  margin-left: 3px;
+  background: #33ff77;
+  color: #05080a;
+  border: 1px solid #33ff77;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* 행성 뷰포트 */
 #viewport-section {
   position: relative;
   flex: 1;
@@ -98,8 +110,8 @@ body {
 
 #planet-canvas {
   image-rendering: pixelated;
-  width: 130px;
-  height: 130px;
+  width: 135px;
+  height: 135px;
 }
 
 #complete-btn {
@@ -117,7 +129,6 @@ body {
 }
 
 .hidden { display: none !important; }
-
 /* 데이터 패널 */
 #data-panel {
   display: flex;
@@ -190,7 +201,6 @@ body {
 #control-panel {
   display: flex;
   flex-direction: column;
-  gap: 5px;
   flex-shrink: 0;
 }
 
@@ -198,7 +208,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
-  max-height: 135px;
+  max-height: 175px;
   overflow-y: auto;
 }
 
@@ -243,18 +253,6 @@ body {
   background: #2b1414;
   color: #ff5555;
   border-color: #ff5555;
-}
-
-#next-day-btn {
-  width: 100%;
-  padding: 9px;
-  background: #33ff77;
-  color: #05080a;
-  border: none;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  flex-shrink: 0;
 }
 
 /* 모달 팝업 */
@@ -332,19 +330,4 @@ body {
   0% { transform: scale(1); }
   50% { transform: scale(1.04); }
   100% { transform: scale(1); }
-}
-/* 퇴근 버튼 하단 고정 및 설비창 스크롤 최적화 */
-#facility-list {
-  max-height: 115px !important;
-  overflow-y: auto !important;
-}
-
-#next-day-btn {
-  display: block !important;
-  width: 100% !important;
-  padding: 10px !important;
-  background: #33ff77 !important;
-  color: #05080a !important;
-  font-weight: bold !important;
-  margin-top: 4px !important;
 }
