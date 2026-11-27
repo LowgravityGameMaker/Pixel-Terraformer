@@ -11,10 +11,10 @@ const EARTH_TARGET = {
 const PLANETS = [
   {
     name: "P-01 아레스-미니",
-    desc: "온화한 소행성. 기초 장비로 충분합니다.",
+    desc: "온화한 소행성. 기초 장비로 목표 95%를 달성하세요.",
     deadline: 35,
     dailyGrant: 65,
-    startBudget: 400,
+    startBudget: 420,
     stats: { temp: -35, press: 20, water: 10, o2: 2, bio: 0 }
   },
   {
@@ -22,36 +22,47 @@ const PLANETS = [
     desc: "혹한의 얼음 위성. 온도와 기압 상승이 시급합니다.",
     deadline: 40,
     dailyGrant: 85,
-    startBudget: 500,
+    startBudget: 520,
     stats: { temp: -75, press: 10, water: 5, o2: 0, bio: 0 }
   },
   {
     name: "P-03 베누스-X",
     desc: "초고온·초고압 지옥 행성. 냉각과 대기 제거가 핵심입니다.",
     deadline: 45,
-    dailyGrant: 120,
-    startBudget: 700,
+    dailyGrant: 125,
+    startBudget: 720,
     stats: { temp: 135, press: 210, water: 0, o2: 0, bio: 0 }
   },
   {
     name: "P-04 헬리오스-IV",
     desc: "태양풍이 몰아치는 방사선 행성. 자기장 방패가 필수입니다.",
     deadline: 50,
-    dailyGrant: 150,
-    startBudget: 850,
+    dailyGrant: 155,
+    startBudget: 880,
     stats: { temp: 65, press: 5, water: 0, o2: 0, bio: 0 }
   }
 ];
 
 const FACILITIES = [
-  { id: "heater", name: "열핵 히터", unlockRank: 0, cost: 90, upkeep: 8, desc: "온도 +4°C", effect: { temp: 4, press: 0, water: 0, o2: 0, bio: 0, shield: 0 } },
-  { id: "pressurizer", name: "가스 방출기", unlockRank: 0, cost: 100, upkeep: 9, desc: "기압 +6kPa, 온도 +1", effect: { temp: 1, press: 6, water: 0, o2: 0, bio: 0, shield: 0 } },
-  { id: "comet", name: "얼음 혜성 유도", unlockRank: 0, cost: 140, upkeep: 8, desc: "수위 +5%, 기압 +2", effect: { temp: -1, press: 2, water: 5, o2: 0, bio: 0, shield: 0 } },
-  { id: "moss", name: "이끼 살포기", unlockRank: 0, cost: 120, upkeep: 10, desc: "생태 +4%, 산소 +1%", effect: { temp: 0, press: 0, water: 0, o2: 1, bio: 4, shield: 0 } },
-  { id: "cooler", name: "궤도 차양막", unlockRank: 1, cost: 130, upkeep: 11, desc: "온도 -6°C", effect: { temp: -6, press: 0, water: 0, o2: 0, bio: 0, shield: 0 } },
-  { id: "forest", name: "유전자 숲 플랜트", unlockRank: 1, cost: 190, upkeep: 16, desc: "생태 +6%, 산소 +3%", effect: { temp: 0, press: 0, water: -1, o2: 3, bio: 6, shield: 0 } },
-  { id: "atmo_stripper", name: "대기 제거 플랜트", unlockRank: 2, cost: 220, upkeep: 18, desc: "기압 -10kPa, 온도 -2", effect: { temp: -2, press: -10, water: 0, o2: 0, bio: 0, shield: 0 } },
-  { id: "mag_shield", name: "인공 자기장 방패", unlockRank: 2, cost: 250, upkeep: 20, desc: "방어 +35%, 기압 +1", effect: { temp: 0, press: 1, water: 0, o2: 0, bio: 0, shield: 35 } }
+  // [인턴 해금 - 기초 설비 6종]
+  { id: "heater", name: "열핵 히터", unlockRank: 0, cost: 85, upkeep: 7, desc: "온도 +4°C", effect: { temp: 4, press: 0, water: 0, o2: 0, bio: 0, shield: 0 } },
+  { id: "cryo_vent", name: "극저온 냉각탑", unlockRank: 0, cost: 90, upkeep: 8, desc: "온도 -4°C", effect: { temp: -4, press: 0, water: 0, o2: 0, bio: 0, shield: 0 } },
+  { id: "pressurizer", name: "가스 방출기", unlockRank: 0, cost: 95, upkeep: 8, desc: "기압 +6kPa, 온도 +1", effect: { temp: 1, press: 6, water: 0, o2: 0, bio: 0, shield: 0 } },
+  { id: "comet", name: "얼음 혜성 유도", unlockRank: 0, cost: 135, upkeep: 7, desc: "수위 +5%, 기압 +2", effect: { temp: -1, press: 2, water: 5, o2: 0, bio: 0, shield: 0 } },
+  { id: "moss", name: "이끼 살포기", unlockRank: 0, cost: 115, upkeep: 9, desc: "생태 +4%, 산소 +1%", effect: { temp: 0, press: 0, water: 0, o2: 1, bio: 4, shield: 0 } },
+  { id: "algae_tank", name: "조류 산소 배양소", unlockRank: 0, cost: 130, upkeep: 10, desc: "산소 +3%, 수위 -1%", effect: { temp: 0, press: 0, water: -1, o2: 3, bio: 1, shield: 0 } },
+
+  // [사원 해금 - 중급 설비 4종]
+  { id: "orbital_mirror", name: "궤도 반사 거울", unlockRank: 1, cost: 150, upkeep: 11, desc: "온도 +8°C, 수위 -1%", effect: { temp: 8, press: 0, water: -1, o2: 0, bio: 0, shield: 0 } },
+  { id: "cooler", name: "궤도 차양막", unlockRank: 1, cost: 150, upkeep: 11, desc: "온도 -8°C", effect: { temp: -8, press: 0, water: 0, o2: 0, bio: 0, shield: 0 } },
+  { id: "ice_drill", name: "지하 빙하 시추기", unlockRank: 1, cost: 165, upkeep: 12, desc: "수위 +8%, 온도 -1", effect: { temp: -1, press: 0, water: 8, o2: 0, bio: 0, shield: 0 } },
+  { id: "forest", name: "유전자 숲 플랜트", unlockRank: 1, cost: 185, upkeep: 15, desc: "생태 +7%, 산소 +3%", effect: { temp: 0, press: 0, water: -1, o2: 3, bio: 7, shield: 0 } },
+
+  // [대리 이상 해금 - 거대 공학 4종]
+  { id: "atmo_stripper", name: "대기 제거 플랜트", unlockRank: 2, cost: 210, upkeep: 16, desc: "기압 -12kPa, 온도 -2", effect: { temp: -2, press: -12, water: 0, o2: 0, bio: 0, shield: 0 } },
+  { id: "soil_microbe", name: "독성 분해 미생물", unlockRank: 2, cost: 200, upkeep: 14, desc: "생태 +10%, 기압 +2", effect: { temp: 0, press: 2, water: 0, o2: 1, bio: 10, shield: 0 } },
+  { id: "mag_shield", name: "인공 자기장 방패", unlockRank: 2, cost: 240, upkeep: 18, desc: "방어 +35%, 기압 +1", effect: { temp: 0, press: 1, water: 0, o2: 0, bio: 0, shield: 35 } },
+  { id: "bio_dome", name: "초거대 생태계 돔", unlockRank: 3, cost: 300, upkeep: 22, desc: "생태 +12%, 산소 +5%", effect: { temp: 1, press: 2, water: 0, o2: 5, bio: 12, shield: 10 } }
 ];
 
 const QUESTS = [
