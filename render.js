@@ -2,10 +2,10 @@ let rotOffset = 0;
 let animFrameId = null;
 
 const STARS = [];
-for (let i = 0; i < 28; i++) {
+for (let i = 0; i < 42; i++) {
   STARS.push({
-    x: Math.floor(Math.random() * 40) * 4,
-    y: Math.floor(Math.random() * 40) * 4,
+    x: Math.floor(Math.random() * 55) * 4,
+    y: Math.floor(Math.random() * 55) * 4,
     bright: i % 2 === 0
   });
 }
@@ -31,14 +31,15 @@ function drawPlanet(stats) {
   const canvas = document.getElementById("planet-canvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
-  const size = 160;
-  const cx = 80;
-  const cy = 80;
-  const radius = 56;
+  const size = 220;
+  const cx = 110;
+  const cy = 110;
+  const radius = 84; // 행성 반지름 대폭 확대
   const pixelSize = 4;
 
   ctx.clearRect(0, 0, size, size);
 
+  // 우주 별
   for (let i = 0; i < STARS.length; i++) {
     const s = STARS[i];
     const blink = (Math.floor(rotOffset * 3) + i) % 5 === 0;
@@ -46,13 +47,15 @@ function drawPlanet(stats) {
     ctx.fillRect(s.x, s.y, 2, 2);
   }
 
+  // 대기권 글로우
   if (stats.press > 15) {
     ctx.beginPath();
-    ctx.arc(cx, cy, radius + 6, 0, Math.PI * 2);
+    ctx.arc(cx, cy, radius + 9, 0, Math.PI * 2);
     ctx.fillStyle = stats.o2 > 10 ? "rgba(0, 190, 255, 0.28)" : "rgba(220, 140, 80, 0.22)";
     ctx.fill();
   }
 
+  // 행성 도트 표면
   for (let y = 0; y < size; y += pixelSize) {
     for (let x = 0; x < size; x += pixelSize) {
       const dx = x - cx;
@@ -60,10 +63,10 @@ function drawPlanet(stats) {
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist <= radius) {
-        const nx = x + rotOffset * 12;
-        const noise = (Math.sin(nx * 0.08) + Math.cos(y * 0.08) + Math.sin((nx + y) * 0.05) + 3) * 16.6;
-        const cloudNoise = (Math.sin((nx * 1.4) * 0.09) + Math.cos(y * 0.11) + 2) * 25;
-        const shade = (dx + dy > 24) ? 0.6 : 1.0;
+        const nx = x + rotOffset * 14;
+        const noise = (Math.sin(nx * 0.065) + Math.cos(y * 0.065) + Math.sin((nx + y) * 0.04) + 3) * 16.6;
+        const cloudNoise = (Math.sin((nx * 1.4) * 0.075) + Math.cos(y * 0.09) + 2) * 25;
+        const shade = (dx + dy > 36) ? 0.6 : 1.0;
 
         let r = 160, g = 82, b = 45;
         if (stats.temp < -15 && noise < stats.water + 15) {
@@ -94,10 +97,11 @@ function drawRadar(stats) {
   const canvas = document.getElementById("radar-canvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
-  const cx = 55, cy = 55, maxR = 42;
+  const cx = 68, cy = 70, maxR = 44;
 
-  ctx.clearRect(0, 0, 110, 110);
+  ctx.clearRect(0, 0, 136, 136);
 
+  const labels = ["온도", "기압", "수위", "산소", "생태"];
   const ratios = [
     Math.max(0, Math.min(1, (stats.temp + 85) / 200)),
     Math.max(0, Math.min(1, stats.press / 202)),
@@ -106,7 +110,21 @@ function drawRadar(stats) {
     Math.max(0, Math.min(1, stats.bio / 160))
   ];
 
-  ctx.strokeStyle = "#1f4d36";
+  // 외곽 최대 범위 오각형 가이드선
+  ctx.strokeStyle = "#132e20";
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+    const x = cx + Math.cos(angle) * maxR;
+    const y = cy + Math.sin(angle) * maxR;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+
+  // 지구 목표 기준선 (0.5 반지름)
+  ctx.strokeStyle = "#2b6648";
   ctx.beginPath();
   for (let i = 0; i < 5; i++) {
     const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
@@ -118,7 +136,8 @@ function drawRadar(stats) {
   ctx.closePath();
   ctx.stroke();
 
-  ctx.fillStyle = "rgba(51, 255, 119, 0.3)";
+  // 현재 행성 수치 다각형
+  ctx.fillStyle = "rgba(51, 255, 119, 0.32)";
   ctx.strokeStyle = "#33ff77";
   ctx.beginPath();
   for (let i = 0; i < 5; i++) {
@@ -132,4 +151,16 @@ function drawRadar(stats) {
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
+
+  // 오각형 각 꼭짓점 이름 라벨 그리기
+  ctx.fillStyle = "#88ccaa";
+  ctx.font = "10px 'Galmuri11', monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (let i = 0; i < 5; i++) {
+    const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+    const lx = cx + Math.cos(angle) * (maxR + 14);
+    const ly = cy + Math.sin(angle) * (maxR + 14);
+    ctx.fillText(labels[i], lx, ly);
+  }
 }
