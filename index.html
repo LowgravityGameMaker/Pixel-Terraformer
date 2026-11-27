@@ -4,11 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TERRA-CORP OS</title>
-  <link rel="stylesheet" href="style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=30">
 </head>
 <body>
   <div id="monitor-frame">
-    <!-- 상단 바: 2줄 구성으로 겹침 완전 방지 -->
+    <!-- 인트로 출근 화면 -->
+    <div id="intro-screen">
+      <div class="intro-box">
+        <div class="intro-logo">TERRA-CORP OS</div>
+        <div class="intro-sub">원격 행성 개조 관제 단말기 v2.6</div>
+        <div class="intro-desc">
+          [근무 수칙]<br>
+          1. 배정된 행성의 지구 유사율 95% 이상 달성<br>
+          2. 과잉 수치(오버슈팅) 주의 및 유지비 통제<br>
+          3. 납기일 초과 및 예산 파산 시 즉시 해고
+        </div>
+        <button id="start-work-btn" onclick="startWork()">[출근 도장 찍기 ▶]</button>
+      </div>
+    </div>
+
+    <!-- 상단 바 -->
     <header id="top-bar">
       <div class="top-row">
         <div>
@@ -76,9 +91,9 @@
     </div>
   </div>
 
-  <script src="sound.js?v=20"></script>
-  <script src="data.js?v=20"></script>
-  <script src="render.js?v=20"></script>
-  <script src="game.js?v=20"></script>
+  <script src="sound.js?v=30"></script>
+  <script src="data.js?v=30"></script>
+  <script src="render.js?v=30"></script>
+  <script src="game.js?v=30"></script>
 </body>
 </html>
