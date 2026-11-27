@@ -30,7 +30,6 @@ function initPlanet(idx) {
   if (typeof startRenderLoop === "function") startRenderLoop();
 }
 
-// textContent를 사용하여 띄어쓰기 완벽 유지
 function setLog(msg) {
   const el = document.getElementById("log-message");
   if (!el) return;
@@ -184,7 +183,7 @@ function nextDay() {
   state.day += 1;
   if (typeof SFX !== "undefined") SFX.nextDay();
 
-  let statusMsg = "[정산 완료] DAY " + state.day + " 출근. 가동 설비 " + activeCount + "기 (순수익 " + (net >= 0 ? "+" : "") + net + "Cr)";
+  let statusMsg = "[정산 완료] " + state.day + "일차 출근. 가동 설비 " + activeCount + "기 (순수익 " + (net >= 0 ? "+" : "") + net + "Cr)";
 
   const hasClaimable = QUESTS.some(q => !state.completedQuests.includes(q.id) && q.check(state.stats));
   if (hasClaimable) {
@@ -257,7 +256,7 @@ function updateUI() {
   const p = PLANETS[state.planetIdx % PLANETS.length];
   document.getElementById("rank-badge").textContent = RANKS[state.rankIdx];
   document.getElementById("planet-name").textContent = p.name;
-  document.getElementById("day-counter").textContent = "D-" + state.day + "/" + p.deadline;
+  document.getElementById("day-counter").textContent = state.day + "일차 (마감 " + p.deadline + "일)";
   document.getElementById("budget-val").textContent = state.budget;
   document.getElementById("shield-status").textContent = "재해 방어율: " + getDefenseRate() + "%";
 
