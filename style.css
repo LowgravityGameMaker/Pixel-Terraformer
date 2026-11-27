@@ -303,3 +303,14 @@ body {
   50% { transform: scale(1.04); }
   100% { transform: scale(1); }
 }
+/* 위험 경고 상태 (예산 부족 / 납기 임박) */
+#monitor-frame.danger-alert {
+  border-color: #ff4444;
+  box-shadow: 0 0 20px rgba(255, 68, 68, 0.35);
+  animation: dangerBlink 1.2s infinite;
+}
+
+@keyframes dangerBlink {
+  0%, 100% { border-color: #ff4444; }
+  50% { border-color: #551111; }
+}
