@@ -30,26 +30,27 @@ function initPlanet(idx) {
   if (typeof startRenderLoop === "function") startRenderLoop();
 }
 
+// textContent를 사용하여 띄어쓰기 완벽 유지
 function setLog(msg) {
   const el = document.getElementById("log-message");
   if (!el) return;
   if (typingTimer) clearInterval(typingTimer);
 
-  el.innerText = "";
+  el.textContent = "";
   let i = 0;
   typingTimer = setInterval(() => {
-    el.innerText += msg.charAt(i);
+    el.textContent += msg.charAt(i);
     if (i % 2 === 0 && typeof SFX !== "undefined" && SFX.type) SFX.type();
     i++;
     if (i >= msg.length) clearInterval(typingTimer);
-  }, 22);
+  }, 20);
 }
 
 function getDefenseRate() {
   let shield = Math.min(40, Math.floor(state.stats.press * 0.35));
   FACILITIES.forEach(f => {
     const item = state.owned[f.id];
-    if (item && item.active && f.effect.shield) {
+    if (item && item.active && f.effect && f.effect.shield) {
       shield += f.effect.shield * item.count;
     }
   });
@@ -71,6 +72,7 @@ function calculateESI() {
 
 function buildFacility(id) {
   const fac = FACILITIES.find(f => f.id === id);
+  if (!fac) return;
   if (state.rankIdx < fac.unlockRank) {
     if (typeof SFX !== "undefined") SFX.alert();
     setLog("[권한 부족] '" + RANKS[fac.unlockRank] + "' 직급 이상만 결재 가능합니다.");
@@ -78,10 +80,11 @@ function buildFacility(id) {
   }
   if (state.budget >= fac.cost) {
     state.budget -= fac.cost;
-    state.owned[id].count++;
+    if (!state.owned[id]) state.owned[id] = { count: 0, active: true };
+    state.owned[id].count += 1;
     state.owned[id].active = true;
     if (typeof SFX !== "undefined") SFX.build();
-    setLog("[설비 가동] " + fac.name + " 건설 완료.");
+    setLog("[설비 가동] " + fac.name + " 건설 완료! (퇴근 시 효과 적용)");
     updateUI();
   } else {
     if (typeof SFX !== "undefined") SFX.alert();
@@ -90,17 +93,18 @@ function buildFacility(id) {
 }
 
 function toggleFacility(id) {
-  if (state.owned[id].count === 0) return;
+  if (!state.owned[id] || state.owned[id].count === 0) return;
   state.owned[id].active = !state.owned[id].active;
   if (typeof SFX !== "undefined") SFX.click();
+  setLog("[전원 제어] 설비 상태를 " + (state.owned[id].active ? "ON" : "OFF") + "으로 전환했습니다.");
   updateUI();
 }
 
 function scrapFacility(id) {
-  if (state.owned[id].count === 0) return;
+  if (!state.owned[id] || state.owned[id].count === 0) return;
   const fac = FACILITIES.find(f => f.id === id);
   const refund = Math.floor(fac.cost * 0.5);
-  state.owned[id].count--;
+  state.owned[id].count -= 1;
   state.budget += refund;
   if (typeof SFX !== "undefined" && SFX.scrap) SFX.scrap();
   setLog("[설비 철거] " + fac.name + " 해체 완료. (+" + refund + " Cr 환수)");
@@ -152,16 +156,18 @@ function claimQuest(qId) {
 function nextDay() {
   const p = PLANETS[state.planetIdx % PLANETS.length];
   let dailyUpkeep = 0;
+  let activeCount = 0;
 
   FACILITIES.forEach(f => {
     const item = state.owned[f.id];
-    if (item.count > 0 && item.active) {
+    if (item && item.count > 0 && item.active) {
+      activeCount += item.count;
       dailyUpkeep += f.upkeep * item.count;
-      state.stats.temp += f.effect.temp * item.count;
-      state.stats.press += f.effect.press * item.count;
-      state.stats.water += f.effect.water * item.count;
-      state.stats.o2 += f.effect.o2 * item.count;
-      state.stats.bio += f.effect.bio * item.count;
+      state.stats.temp += (f.effect.temp || 0) * item.count;
+      state.stats.press += (f.effect.press || 0) * item.count;
+      state.stats.water += (f.effect.water || 0) * item.count;
+      state.stats.o2 += (f.effect.o2 || 0) * item.count;
+      state.stats.bio += (f.effect.bio || 0) * item.count;
     }
   });
 
@@ -173,34 +179,39 @@ function nextDay() {
   state.stats.bio = Math.max(0, Math.min(100, state.stats.bio));
   state.stats.press = Math.max(0, state.stats.press);
 
-  state.budget += (p.dailyGrant - dailyUpkeep);
-  state.day++;
+  const net = p.dailyGrant - dailyUpkeep;
+  state.budget += net;
+  state.day += 1;
   if (typeof SFX !== "undefined") SFX.nextDay();
+
+  let statusMsg = "[정산 완료] DAY " + state.day + " 출근. 가동 설비 " + activeCount + "기 (순수익 " + (net >= 0 ? "+" : "") + net + "Cr)";
 
   const hasClaimable = QUESTS.some(q => !state.completedQuests.includes(q.id) && q.check(state.stats));
   if (hasClaimable) {
     state.unreadMail = true;
-    setLog("[메일 수신] 단기 퀘스트 목표 달성! 우측 상단 ✉ 메일함을 확인하세요.");
+    statusMsg = "[메일 수신] 단기 퀘스트 목표 달성! 우측 상단 ✉ 메일함을 확인하세요.";
   }
 
-  if (Math.random() < 0.28) {
+  if (Math.random() < 0.25) {
     const ev = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
     if (ev.effect && (ev.effect.temp > 0 || ev.effect.bio < 0)) {
       const def = getDefenseRate();
       if (Math.random() * 100 < def) {
-        setLog("[방어 성공] 대기 및 자기장 방패(" + def + "%)가 우주 재해를 막아냈습니다!");
+        statusMsg = "[방어 성공] 대기 및 자기장 방패(" + def + "%)가 우주 재해를 막아냈습니다!";
       } else {
-        setLog(ev.msg);
-        state.stats.temp += ev.effect.temp;
-        state.stats.press = Math.max(0, state.stats.press + ev.effect.press);
-        state.stats.bio = Math.max(0, state.stats.bio + ev.effect.bio);
+        statusMsg = ev.msg;
+        state.stats.temp += (ev.effect.temp || 0);
+        state.stats.press = Math.max(0, state.stats.press + (ev.effect.press || 0));
+        state.stats.bio = Math.max(0, state.stats.bio + (ev.effect.bio || 0));
         if (typeof SFX !== "undefined") SFX.alert();
       }
     } else {
-      setLog(ev.msg);
+      statusMsg = ev.msg;
       if (ev.budget) state.budget += ev.budget;
     }
   }
+
+  setLog(statusMsg);
 
   if (state.budget < 0) {
     if (typeof SFX !== "undefined") SFX.alert();
@@ -244,11 +255,11 @@ function completeProject() {
 
 function updateUI() {
   const p = PLANETS[state.planetIdx % PLANETS.length];
-  document.getElementById("rank-badge").innerText = RANKS[state.rankIdx];
-  document.getElementById("planet-name").innerText = p.name;
-  document.getElementById("day-counter").innerText = "D-" + state.day + "/" + p.deadline;
-  document.getElementById("budget-val").innerText = state.budget;
-  document.getElementById("shield-status").innerText = "재해 방어율: " + getDefenseRate() + "%";
+  document.getElementById("rank-badge").textContent = RANKS[state.rankIdx];
+  document.getElementById("planet-name").textContent = p.name;
+  document.getElementById("day-counter").textContent = "D-" + state.day + "/" + p.deadline;
+  document.getElementById("budget-val").textContent = state.budget;
+  document.getElementById("shield-status").textContent = "재해 방어율: " + getDefenseRate() + "%";
 
   const frame = document.getElementById("monitor-frame");
   if (state.budget < 80 || (p.deadline - state.day) <= 5) {
@@ -267,27 +278,27 @@ function updateUI() {
   });
   const net = p.dailyGrant - upkeep;
   const netEl = document.getElementById("net-income");
-  netEl.innerText = (net >= 0 ? "+" : "") + net;
+  netEl.textContent = (net >= 0 ? "+" : "") + net;
   netEl.style.color = net >= 0 ? "#33ff77" : "#ff5555";
 
   const s = state.stats;
-  document.getElementById("val-temp").innerText = s.temp + "°C";
+  document.getElementById("val-temp").textContent = s.temp + "°C";
   document.getElementById("bar-temp").style.width = Math.max(0, Math.min(100, (s.temp + 85) / 2)) + "%";
 
-  document.getElementById("val-press").innerText = s.press + "kPa";
+  document.getElementById("val-press").textContent = s.press + "kPa";
   document.getElementById("bar-press").style.width = Math.max(0, Math.min(100, s.press / 2)) + "%";
 
-  document.getElementById("val-water").innerText = s.water + "%";
+  document.getElementById("val-water").textContent = s.water + "%";
   document.getElementById("bar-water").style.width = s.water + "%";
 
-  document.getElementById("val-o2").innerText = s.o2 + "%";
+  document.getElementById("val-o2").textContent = s.o2 + "%";
   document.getElementById("bar-o2").style.width = Math.min(100, s.o2 * 2.5) + "%";
 
-  document.getElementById("val-bio").innerText = s.bio + "%";
+  document.getElementById("val-bio").textContent = s.bio + "%";
   document.getElementById("bar-bio").style.width = s.bio + "%";
 
   const esi = calculateESI();
-  document.getElementById("esi-val").innerText = esi.toFixed(1);
+  document.getElementById("esi-val").textContent = esi.toFixed(1);
   const compBtn = document.getElementById("complete-btn");
   if (esi >= 97) compBtn.classList.remove("hidden");
   else compBtn.classList.add("hidden");
